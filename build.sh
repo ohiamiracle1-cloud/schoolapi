@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #to exit on error
-set -0 errexit
+set -o errexit
 
 pip install -r requirements.txt
 

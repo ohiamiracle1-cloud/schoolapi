@@ -1,0 +1,43 @@
+{% extends contect %}
+{% block contect %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>teacher dashboard</title>
+</head>
+<body>
+    <div>
+        <h2>teacher workspace</h2>
+        <p>Welcom back, {{user.get_full_name | default:user.username}}</p>
+    </div>
+
+    <div>
+        <h3>Assigned subjects</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject Name</th>
+                    <th>Code</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sujbect in subject %}
+                <tr>
+                    <td>{{subject.name}}</td>
+                    <td>{{subject.code}}</td>
+                    <td><a href="{% url 'record_grade' subject.id %}"
+                        >Manage grade</a></td>
+                        {% empty %}
+
+                        <tr><td>No Subjects assigned yet.</td></tr>
+                        {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

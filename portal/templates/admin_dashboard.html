@@ -1,0 +1,30 @@
+{% extends contect %}
+{% block contect %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin dashboard</title>
+</head>
+<body>
+    <div>
+        <h2>School Overview (Admin)</h2>
+
+        <div>
+            <div>
+                <h3>{{total_student}}</h3>
+                <p>Teachers</p>
+            </div>
+
+            <div>
+                <h3>{{total_subject}}</h3>
+                <p>Subject</p>
+            </div>
+        </div>
+        <p><a href="/admin/">Open django admin panel</a></p>
+    </div>
+    {% endblock %}
+</body>
+</html>

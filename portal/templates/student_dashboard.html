@@ -1,0 +1,59 @@
+{% extends contect %}
+{% block contect %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>student dashboard</title>
+</head>
+
+<body>
+    <div>
+        <h2>Student Academic Record</h2>
+        <p><strong>Student:</strong>{{user.get_full_name| default:
+            user.username}}</p>
+        <p><strong>Admission No:</strong>{{profile.admission_number |
+            default: 'Pending'}}</p>
+        <p><strong>Class</strong>{{profile.current_class.name |
+            default: 'Unassigned'}}</p>
+    </div>
+
+    <div>
+        <h2>Subject Grades</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Session</th>
+                    <th>CA (40%)</th>
+                    <th>Exam (40%)</th>
+                    <th>Total (100%)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    {% for g in grades %}
+                    <td>{{g.subject.name}}</td>
+                    <td>{{g.session.name}}</td>
+                    <td>{{g.cintonuous_assassment}}</td>
+                    <td>{{g.exam_score}}</td>
+                    <td><strong>{{g.total_score}}</strong></td>
+                </tr>
+                {% empty %}
+
+                <tr>
+                    <td>No grade records published</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endblock %}
+</body>
+
+</html>

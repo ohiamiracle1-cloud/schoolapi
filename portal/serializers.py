@@ -1,11 +1,14 @@
+from django.db import transaction
 from rest_framework import serializers
 from accounts.models import User, StudentProfile, TeacherProfile
 from academics.models import AcademicsSession, ClassRoom, Subject, Grade
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role','phone_number']
+        fields = ['id', 'username', 'email', 'role', 'phone_number']
+
 
 class StudentProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -13,7 +16,8 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentProfile
-        fields = ['id', 'user', 'class_name', 'admission_number','date_of_birth', 'class_name']
+        fields = ['id', 'user', 'class_name', 'admission_number', 'date_of_birth']
+
 
 class SubjectSerializer(serializers.ModelSerializer):
     teacher_name = serializers.CharField(source='teacher.username', read_only=True)
@@ -22,16 +26,18 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ['id', 'name', 'code', 'teacher_name', 'teacher']
 
+
 class GradeSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.user.get_full_name', read_only=True)
     subject_name = serializers.CharField(source='subject.name', read_only=True)
-    
+
     class Meta:
         model = Grade
         fields = ['id', 'student_name', 'subject_name', 'session', 'continous_assessment', 'exam_score', 'total_score']
 
     def get_total_score(self, obj):
         return obj.total_score()
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
@@ -49,3 +55,27 @@ class RegisterSerializer(serializers.ModelSerializer):
             'last_name', 'role', 'phone_number', 'admission_number',
             'employee_id'
         ]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        # Pull out the non-User fields and the raw password
+        admission_number = validated_data.pop('admission_number', '')
+        employee_id = validated_data.pop('employee_id', '')
+        password = validated_data.pop('password')
+
+        # Hash the password properly
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        # Create the matching profile (adjust field/role names to your models)
+        if user.role == 'STUDENT' and admission_number:
+            StudentProfile.objects.create(
+                user=user, admission_number=admission_number
+            )
+        elif user.role == 'TEACHER' and employee_id:
+            TeacherProfile.objects.create(
+                user=user, employee_id=employee_id
+            )
+
+        return user
